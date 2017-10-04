@@ -40,7 +40,7 @@ public class DailyForecastListAdapter extends RecyclerView.Adapter<DailyForecast
         }
         dailyTmp += "     " + item.getMinTemperature() + "°~" + item.getMaxTemperature() + "°";
         holder.tvDailyTmp.setText(dailyTmp);
-        String dailyDetail = "白天" + item.getTxtDay() + "，夜晚" + item.getTextNight() + "。"
+        String dailyDetail = "白天" + item.getTxtDay() + "，夜晚" + item.getTxtNight() + "。"
                 + item.getWindType() + "  " + item.getWindDegree() + "级。" + "日出在" + item.getSunRise() + "，"
                 + "日落在" + item.getSunSet();
         holder.tvDailyDetail.setText(dailyDetail);

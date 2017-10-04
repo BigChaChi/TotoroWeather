@@ -34,9 +34,11 @@ import java.util.List;
 
 import totoro.application.xkf.totoroweather.R;
 import totoro.application.xkf.totoroweather.adapter.DailyForecastListAdapter;
+import totoro.application.xkf.totoroweather.adapter.HourlyForecastListAdapter;
 import totoro.application.xkf.totoroweather.application.AppCache;
 import totoro.application.xkf.totoroweather.listener.OnLoadFinishListener;
 import totoro.application.xkf.totoroweather.model.DailyForecast;
+import totoro.application.xkf.totoroweather.model.HourlyForecast;
 import totoro.application.xkf.totoroweather.model.NowWeather;
 import totoro.application.xkf.totoroweather.model.Weather;
 import totoro.application.xkf.totoroweather.service.DataService;
@@ -212,6 +214,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         //更新一系列天气
         updateNowWeather(weather.getNowWeather());
         updateDailyForecast(weather.getDailyForecast());
+        updateHourlyForecast(weather.getHourlyForecast());
         srlRefreshLayout.setRefreshing(false);
     }
 
@@ -231,6 +234,14 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rvDailyForecastList.setLayoutManager(manager);
         rvDailyForecastList.setAdapter(adapter);
+    }
+
+    public void updateHourlyForecast(HourlyForecast hourlyForecast) {
+        HourlyForecastListAdapter adapter = new HourlyForecastListAdapter(hourlyForecast);
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        manager.setOrientation(LinearLayoutManager.VERTICAL);
+        rvHourlyList.setLayoutManager(manager);
+        rvHourlyList.setAdapter(adapter);
     }
 
     @Override

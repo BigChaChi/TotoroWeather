@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import totoro.application.xkf.totoroweather.model.DailyForecast;
+import totoro.application.xkf.totoroweather.model.HourlyForecast;
 import totoro.application.xkf.totoroweather.model.NowWeather;
 import totoro.application.xkf.totoroweather.model.Weather;
 import totoro.application.xkf.totoroweather.util.LogUtil;
@@ -16,7 +17,7 @@ public class JsonForWeather {
         public Basic basic;
         public Now now;
         public List<DailyForecast> daily_forecast;
-//        public HourlyForecast hourly_forecast;
+        public List<HourlyForecast> hourly_forecast;
 //        public Suggestion suggestion;
 
         public class Basic {
@@ -57,6 +58,21 @@ public class JsonForWeather {
         }
 
         public class HourlyForecast {
+            public Cond cond;
+
+            public class Cond {
+                public String code;
+                public String txt;
+            }
+
+            public String date;
+            public String tmp;
+            public Wind wind;
+
+            public class Wind {
+                public String dir;
+                public String sc;
+            }
         }
 
         public class Now {
@@ -88,7 +104,27 @@ public class JsonForWeather {
         weather.setNowWeather(nowWeather);
         DailyForecast dailyForecast = getDailyForecast(info);
         weather.setDailyForecast(dailyForecast);
+        HourlyForecast hourlyForecast = getHourlyForecast(info);
+        weather.setHourlyForecast(hourlyForecast);
         return weather;
+    }
+
+    private HourlyForecast getHourlyForecast(Info info) {
+        HourlyForecast hourlyForecast = new HourlyForecast();
+        List<HourlyForecast.Item> list = new ArrayList<>();
+        for (Info.HourlyForecast hourly : info.hourly_forecast) {
+            HourlyForecast.Item item = hourlyForecast.new Item();
+            item.setCode(hourly.cond.code);
+            item.setTxt(hourly.cond.txt);
+            String time = hourly.date.substring(hourly.date.length() - 5);
+            item.setTime(time);
+            item.setWindDegree(hourly.wind.sc);
+            item.setWindType(hourly.wind.dir);
+            item.setTemperature(hourly.tmp);
+            list.add(item);
+        }
+        hourlyForecast.setList(list);
+        return hourlyForecast;
     }
 
     private NowWeather getNowWeather(Info info) {
@@ -114,7 +150,7 @@ public class JsonForWeather {
             item.setMinTemperature(daily.tmp.min);
             item.setSunRise(daily.astro.sr);
             item.setSunSet(daily.astro.ss);
-            item.setTextNight(daily.cond.txt_n);
+            item.setTxtNight(daily.cond.txt_n);
             item.setTxtDay(daily.cond.txt_d);
             item.setWindDegree(daily.wind.sc);
             item.setWindType(daily.wind.dir);

@@ -16,7 +16,7 @@ public class DailyForecast {
         //白天天气描述
         private String txtDay;
         //晚上天气描述
-        private String textNight;
+        private String txtNight;
         //最高温度
         private String maxTemperature;
         //最低温度
@@ -58,12 +58,12 @@ public class DailyForecast {
             this.txtDay = txtDay;
         }
 
-        public String getTextNight() {
-            return textNight;
+        public String getTxtNight() {
+            return txtNight;
         }
 
-        public void setTextNight(String textNight) {
-            this.textNight = textNight;
+        public void setTxtNight(String textNight) {
+            this.txtNight = textNight;
         }
 
         public String getMaxTemperature() {
