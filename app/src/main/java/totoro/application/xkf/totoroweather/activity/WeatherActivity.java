@@ -13,6 +13,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -32,8 +33,10 @@ import java.util.Date;
 import java.util.List;
 
 import totoro.application.xkf.totoroweather.R;
+import totoro.application.xkf.totoroweather.adapter.DailyForecastListAdapter;
 import totoro.application.xkf.totoroweather.application.AppCache;
 import totoro.application.xkf.totoroweather.listener.OnLoadFinishListener;
+import totoro.application.xkf.totoroweather.model.DailyForecast;
 import totoro.application.xkf.totoroweather.model.NowWeather;
 import totoro.application.xkf.totoroweather.model.Weather;
 import totoro.application.xkf.totoroweather.service.DataService;
@@ -50,7 +53,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     private ImageView ivHeaderImage;
     private Toolbar tbToolbar;
     private SwipeRefreshLayout srlRefreshLayout;
-    private RecyclerView rvNowWeatherList;
+    private RecyclerView rvDailyForecastList;
     private RecyclerView rvSuggestionList;
     private RecyclerView rvHourlyList;
     private ImageView ivNowWeatherIcon;
@@ -117,6 +120,10 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         srlRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.srl_refresh_layout);
         mSnackbar = Snackbar.make(ctlCollapsingToolbarLayout, "", Snackbar.LENGTH_SHORT);
         srlRefreshLayout.setOnRefreshListener(this);
+        rvDailyForecastList = (RecyclerView) findViewById(R.id.rv_forecast_list);
+        rvHourlyList = (RecyclerView) findViewById(R.id.rv_hourly_list);
+        rvSuggestionList = (RecyclerView) findViewById(R.id.rv_suggestion_list);
+
         //显示菜单按钮
         setSupportActionBar(tbToolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -129,6 +136,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         } else {
             mSnackbar.setText("没有网").show();
         }
+
     }
 
 
@@ -203,18 +211,26 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         mSnackbar.show();
         //更新一系列天气
         updateNowWeather(weather.getNowWeather());
-
+        updateDailyForecast(weather.getDailyForecast());
         srlRefreshLayout.setRefreshing(false);
     }
 
     public void updateNowWeather(NowWeather nowWeather) {
         String feelAndWnd = "体感温度  " + nowWeather.getFeel() + "°  " + nowWeather.getWindType() + "  " +
-                nowWeather.getWindDegree();
+                nowWeather.getWindDegree() + "级";
         tvFeelAndWind.setText(feelAndWnd);
         String tmpAndWeather = nowWeather.getDescription() + "     " + nowWeather.getTemperature() + "°";
         tvTmpAndWeather.setText(tmpAndWeather);
         ivHeaderImage.setImageResource(ImageSelector.selectHeadImage(nowWeather.getCode()));
         ivNowWeatherIcon.setImageResource(ImageSelector.selectWeatherIcon(nowWeather.getCode()));
+    }
+
+    public void updateDailyForecast(DailyForecast dailyForecast) {
+        DailyForecastListAdapter adapter = new DailyForecastListAdapter(dailyForecast);
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        manager.setOrientation(LinearLayoutManager.VERTICAL);
+        rvDailyForecastList.setLayoutManager(manager);
+        rvDailyForecastList.setAdapter(adapter);
     }
 
     @Override

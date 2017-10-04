@@ -1,7 +1,9 @@
 package totoro.application.xkf.totoroweather.json;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import totoro.application.xkf.totoroweather.model.DailyForecast;
 import totoro.application.xkf.totoroweather.model.NowWeather;
 import totoro.application.xkf.totoroweather.model.Weather;
 import totoro.application.xkf.totoroweather.util.LogUtil;
@@ -13,7 +15,7 @@ public class JsonForWeather {
     public class Info {
         public Basic basic;
         public Now now;
-//        public DailyForecast daily_forecast;
+        public List<DailyForecast> daily_forecast;
 //        public HourlyForecast hourly_forecast;
 //        public Suggestion suggestion;
 
@@ -23,6 +25,35 @@ public class JsonForWeather {
         }
 
         public class DailyForecast {
+            public Astro astro;
+
+            public class Astro {
+                public String sr;
+                public String ss;
+            }
+
+            public Cond cond;
+
+            public class Cond {
+                public String code_d;
+                public String txt_d;
+                public String txt_n;
+            }
+
+            public Tmp tmp;
+
+            public class Tmp {
+                public String max;
+                public String min;
+            }
+
+            public Wind wind;
+
+            public class Wind {
+                public String dir;
+                public String sc;
+            }
+
         }
 
         public class HourlyForecast {
@@ -55,6 +86,8 @@ public class JsonForWeather {
         Info info = HeWeather5.get(0);
         NowWeather nowWeather = getNowWeather(info);
         weather.setNowWeather(nowWeather);
+        DailyForecast dailyForecast = getDailyForecast(info);
+        weather.setDailyForecast(dailyForecast);
         return weather;
     }
 
@@ -69,5 +102,25 @@ public class JsonForWeather {
         nowWeather.setWindDegree(info.now.wind.sc);
         nowWeather.setWindType(info.now.wind.dir);
         return nowWeather;
+    }
+
+    private DailyForecast getDailyForecast(Info info) {
+        DailyForecast dailyForecast = new DailyForecast();
+        List<DailyForecast.Item> list = new ArrayList<>();
+        for (Info.DailyForecast daily : info.daily_forecast) {
+            DailyForecast.Item item = dailyForecast.new Item();
+            item.setCodeDay(daily.cond.code_d);
+            item.setMaxTemperature(daily.tmp.max);
+            item.setMinTemperature(daily.tmp.min);
+            item.setSunRise(daily.astro.sr);
+            item.setSunSet(daily.astro.ss);
+            item.setTextNight(daily.cond.txt_n);
+            item.setTxtDay(daily.cond.txt_d);
+            item.setWindDegree(daily.wind.sc);
+            item.setWindType(daily.wind.dir);
+            list.add(item);
+        }
+        dailyForecast.setDailyForecast(list);
+        return dailyForecast;
     }
 }
