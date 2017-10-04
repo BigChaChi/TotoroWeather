@@ -71,10 +71,11 @@
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:id="@+id/now_weather_icon"
+                                android:id="@+id/iv_now_weather_icon"
                                 android:layout_width="?attr/actionBarSize"
                                 android:layout_height="?attr/actionBarSize"
-                                android:scaleType="fitXY" />
+                                android:scaleType="fitXY"
+                                android:src="@mipmap/ic_weather_icon_999" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -138,10 +139,6 @@
                 </LinearLayout>
             </android.support.v4.widget.NestedScrollView>
         </android.support.v4.widget.SwipeRefreshLayout>
-        <android.support.design.widget.FloatingActionButton
-            android:layout_height="?attr/fabSize"
-            android:layout_width="?attr/fabSize"
-            />
 
     </android.support.design.widget.CoordinatorLayout>
 

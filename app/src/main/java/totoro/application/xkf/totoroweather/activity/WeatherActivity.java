@@ -5,8 +5,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
-import android.preference.Preference;
-import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -113,6 +111,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         ctlCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.ctl_collapsing_layout);
         tbToolbar = (Toolbar) findViewById(R.id.tb_toolbar);
         ivHeaderImage = (ImageView) findViewById(R.id.iv_header_image);
+        ivNowWeatherIcon = (ImageView) findViewById(R.id.iv_now_weather_icon);
         tvTmpAndWeather = (TextView) findViewById(R.id.tv_tmp_and_weather);
         tvFeelAndWind = (TextView) findViewById(R.id.tv_feel_and_wind);
         srlRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.srl_refresh_layout);
@@ -163,7 +162,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case REQUEST_CODE:
                 for (int value : grantResults) {
@@ -182,11 +181,13 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     public void onLocationChanged(AMapLocation aMapLocation) {
         if (aMapLocation != null) {
             if (aMapLocation.getErrorCode() == 0) {
-                String city = aMapLocation.getCity();
-                ctlCollapsingToolbarLayout.setTitle(city);
-                mDataService.searchCity(city, true, null);
-                mDataService.loadWeatherInfo(city, this);
-                LocationUtil.stop();
+                if (mDataService.getCurrentCityId() == null) {
+                    LocationUtil.stop();
+                    String city = aMapLocation.getCity();
+                    ctlCollapsingToolbarLayout.setTitle(city);
+                    mDataService.searchCity(city, true, null);
+                    mDataService.loadWeatherInfo(city, this);
+                }
             } else {
                 //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                 LogUtil.show("AmapError" + "location Error, ErrCode:"
@@ -202,6 +203,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         mSnackbar.show();
         //更新一系列天气
         updateNowWeather(weather.getNowWeather());
+
         srlRefreshLayout.setRefreshing(false);
     }
 
@@ -212,6 +214,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         String tmpAndWeather = nowWeather.getDescription() + "     " + nowWeather.getTemperature() + "°";
         tvTmpAndWeather.setText(tmpAndWeather);
         ivHeaderImage.setImageResource(ImageSelector.selectHeadImage(nowWeather.getCode()));
+        ivNowWeatherIcon.setImageResource(ImageSelector.selectWeatherIcon(nowWeather.getCode()));
     }
 
     @Override
@@ -231,4 +234,6 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
             mDataService.loadWeatherInfo(city, this);
         }
     }
+
+
 }
