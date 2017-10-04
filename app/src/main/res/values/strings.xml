@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">龙猫天气</string>
+    <string name="finish_prompt">再按一次退出</string>
+    <string name="loadFail">加载失败</string>
+    <string name="unKnow">未知</string>
+    <string name="loadSuccess">成功加载了最新天气</string>
+    <string name="localCityId">LocalCityId</string>
+    <string name="currentCityId">CurrentCityId</string>
+    <string name="allCities">AllCities</string>
+</resources>
