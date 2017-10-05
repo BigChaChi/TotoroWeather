@@ -13,6 +13,8 @@ public class DailyForecast {
         private String sunSet;
         //白天的天气代码
         private String codeDay;
+        //夜晚的天气代码
+        private String codeNight;
         //白天天气描述
         private String txtDay;
         //晚上天气描述
@@ -25,6 +27,14 @@ public class DailyForecast {
         private String windType;
         //风力大小
         private String windDegree;
+
+        public String getCodeNight() {
+            return codeNight;
+        }
+
+        public void setCodeNight(String codeNight) {
+            this.codeNight = codeNight;
+        }
 
         public String getSunRise() {
             return sunRise;
@@ -106,4 +116,6 @@ public class DailyForecast {
     public void setDailyForecast(List<Item> dailyForecast) {
         this.dailyForecast = dailyForecast;
     }
+
+
 }

@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -19,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,6 +40,7 @@ import totoro.application.xkf.totoroweather.adapter.HourlyForecastListAdapter;
 import totoro.application.xkf.totoroweather.adapter.SuggestionListAdapter;
 import totoro.application.xkf.totoroweather.application.AppCache;
 import totoro.application.xkf.totoroweather.listener.OnLoadFinishListener;
+import totoro.application.xkf.totoroweather.listener.OnSunChangeListener;
 import totoro.application.xkf.totoroweather.model.DailyForecast;
 import totoro.application.xkf.totoroweather.model.HourlyForecast;
 import totoro.application.xkf.totoroweather.model.NowWeather;
@@ -51,7 +54,7 @@ import totoro.application.xkf.totoroweather.util.NetUtil;
 import totoro.application.xkf.totoroweather.util.PreferenceUtil;
 
 public class WeatherActivity extends AppCompatActivity implements AMapLocationListener,
-        OnLoadFinishListener, SwipeRefreshLayout.OnRefreshListener {
+        OnLoadFinishListener, SwipeRefreshLayout.OnRefreshListener, OnSunChangeListener {
     private DrawerLayout dlDrawerLayout;
     private CollapsingToolbarLayout ctlCollapsingToolbarLayout;
     private ImageView ivHeaderImage;
@@ -63,6 +66,8 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     private ImageView ivNowWeatherIcon;
     private TextView tvTmpAndWeather;
     private TextView tvFeelAndWind;
+    private NavigationView nvNavigationView;
+    private ImageView ivNavigationHeadimage;
 
     private Handler mHandler = new Handler();
     private Snackbar mSnackbar;
@@ -127,6 +132,9 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         rvDailyForecastList = (RecyclerView) findViewById(R.id.rv_forecast_list);
         rvHourlyList = (RecyclerView) findViewById(R.id.rv_hourly_list);
         rvSuggestionList = (RecyclerView) findViewById(R.id.rv_suggestion_list);
+        nvNavigationView = (NavigationView) findViewById(R.id.nv_navigation_view);
+        View headLayout = nvNavigationView.getHeaderView(0);
+        ivNavigationHeadimage = headLayout.findViewById(R.id.iv_navigation_head_image);
 
         //显示菜单按钮
         setSupportActionBar(tbToolbar);
@@ -235,12 +243,12 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         tvFeelAndWind.setText(feelAndWnd);
         String tmpAndWeather = nowWeather.getDescription() + "     " + nowWeather.getTemperature() + "°";
         tvTmpAndWeather.setText(tmpAndWeather);
-        ivHeaderImage.setImageResource(ImageSelector.selectHeadImage(nowWeather.getCode()));
         ivNowWeatherIcon.setImageResource(ImageSelector.selectWeatherIcon(nowWeather.getCode()));
     }
 
     public void updateDailyForecast(DailyForecast dailyForecast) {
         DailyForecastListAdapter adapter = new DailyForecastListAdapter(dailyForecast);
+        adapter.setSunChangeListener(this);
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rvDailyForecastList.setLayoutManager(manager);
@@ -274,4 +282,9 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     }
 
 
+    @Override
+    public void onSunChange(String dayCode, String nightCode, String sunRise, String sunSet) {
+        ivHeaderImage.setImageResource(ImageSelector.selectHeadImage(dayCode, nightCode, sunRise, sunSet));
+        ivNavigationHeadimage.setImageResource(ImageSelector.selectNavitionHeadImage(sunRise, sunSet));
+    }
 }

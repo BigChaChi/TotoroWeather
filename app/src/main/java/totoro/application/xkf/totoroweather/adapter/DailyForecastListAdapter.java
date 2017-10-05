@@ -8,15 +8,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import totoro.application.xkf.totoroweather.R;
+import totoro.application.xkf.totoroweather.listener.OnSunChangeListener;
 import totoro.application.xkf.totoroweather.model.DailyForecast;
 import totoro.application.xkf.totoroweather.util.ImageSelector;
 
 public class DailyForecastListAdapter extends RecyclerView.Adapter<DailyForecastListAdapter.ViewHolder> {
     private DailyForecast mDailyForecast;
+    private OnSunChangeListener mSunChangeListener;
 
     public DailyForecastListAdapter(DailyForecast dailyForecast) {
         super();
         mDailyForecast = dailyForecast;
+    }
+
+    public void setSunChangeListener(OnSunChangeListener listener) {
+        mSunChangeListener = listener;
     }
 
     @Override
@@ -33,6 +39,7 @@ public class DailyForecastListAdapter extends RecyclerView.Adapter<DailyForecast
         String dailyTmp = "";
         if (position == 0) {
             dailyTmp += "今天";
+            mSunChangeListener.onSunChange(item.getCodeDay(), item.getCodeNight(), item.getSunRise(), item.getSunSet());
         } else if (position == 1) {
             dailyTmp += "明天";
         } else {

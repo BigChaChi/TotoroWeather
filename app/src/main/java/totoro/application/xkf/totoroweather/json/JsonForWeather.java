@@ -28,33 +28,34 @@ public class JsonForWeather {
         }
 
         private class DailyForecast {
-            public Astro astro;
+            private Astro astro;
 
-            public class Astro {
-                public String sr;
-                public String ss;
+            private class Astro {
+                private String sr;
+                private String ss;
             }
 
-            public Cond cond;
+            private Cond cond;
 
-            public class Cond {
-                public String code_d;
-                public String txt_d;
-                public String txt_n;
+            private class Cond {
+                private String code_d;
+                private String code_n;
+                private String txt_d;
+                private String txt_n;
             }
 
-            public Tmp tmp;
+            private Tmp tmp;
 
-            public class Tmp {
-                public String max;
-                public String min;
+            private class Tmp {
+                private String max;
+                private String min;
             }
 
-            public Wind wind;
+            private Wind wind;
 
-            public class Wind {
-                public String dir;
-                public String sc;
+            private class Wind {
+                private String dir;
+                private String sc;
             }
 
         }
@@ -205,6 +206,7 @@ public class JsonForWeather {
         for (Info.DailyForecast daily : info.daily_forecast) {
             DailyForecast.Item item = dailyForecast.new Item();
             item.setCodeDay(daily.cond.code_d);
+            item.setCodeNight(daily.cond.code_n);
             item.setMaxTemperature(daily.tmp.max);
             item.setMinTemperature(daily.tmp.min);
             item.setSunRise(daily.astro.sr);

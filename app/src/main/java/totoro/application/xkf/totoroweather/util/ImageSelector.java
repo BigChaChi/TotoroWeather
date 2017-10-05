@@ -1,24 +1,28 @@
 package totoro.application.xkf.totoroweather.util;
 
+import android.util.Log;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import totoro.application.xkf.totoroweather.R;
 
 public class ImageSelector {
-    public static int selectHeadImage(String weatherCode) {
+    public static int selectHeadImage(String dayCode, String nightCode, String sunRise, String sunSet) {
         //先判断是白天还是晚上
         //再判断天气的类型
-        int code = Integer.parseInt(weatherCode);
-        int image = 0;
-        SimpleDateFormat sdf = new SimpleDateFormat("HH");
-        String hour = sdf.format(new Date());
-        int time = Integer.parseInt(hour);
-        boolean isDay = false;
-        if (time >= 9 && time <= 21) {
-            isDay = true;
+        int dCode = Integer.parseInt(dayCode);
+        int nCode = Integer.parseInt(nightCode);
+        int code = nCode;
+        boolean isDay = isDay(sunRise, sunSet);
+        if (isDay) {
+            code = dCode;
         }
-        //雾，雨，雪，多云，晴
+        return selectHeadImage(isDay, code);
+    }
+
+    private static int selectHeadImage(boolean isDay, int code) {
+        int image;
         if (code == 100) {
             //晴
             image = R.mipmap.header_weather_night_sunny;
@@ -50,6 +54,28 @@ public class ImageSelector {
             image = R.mipmap.header_image_weather;
         }
         return image;
+    }
+
+    private static boolean isDay(String sunRise, String sunSet) {
+        SimpleDateFormat sdf = new SimpleDateFormat("HH");
+        String hour = sdf.format(new Date());
+        int time = Integer.parseInt(hour);
+        String sunRiseTime = sunRise.substring(0, sunRise.length() - 3);
+        String sunSetTime = sunSet.substring(0, sunSet.length() - 3);
+        int rTime = Integer.parseInt(sunRiseTime);
+        int sTime = Integer.parseInt(sunSetTime);
+        if (time > sTime || time < rTime) {
+            return false;
+        }
+        return true;
+    }
+
+    public static int selectNavitionHeadImage(String sunRise, String sunSet) {
+        if (isDay(sunRise, sunSet)) {
+            return R.mipmap.header_sunrise;
+        } else {
+            return R.mipmap.header_sunset;
+        }
     }
 
     public static int selectWeatherIcon(String weatherCode) {
