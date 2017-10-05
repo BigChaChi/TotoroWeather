@@ -1,10 +1,13 @@
 package totoro.application.xkf.totoroweather.activity;
 
 import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -47,6 +50,7 @@ import totoro.application.xkf.totoroweather.model.NowWeather;
 import totoro.application.xkf.totoroweather.model.Suggestion;
 import totoro.application.xkf.totoroweather.model.Weather;
 import totoro.application.xkf.totoroweather.service.DataService;
+import totoro.application.xkf.totoroweather.util.AlertDialogBuilder;
 import totoro.application.xkf.totoroweather.util.ImageSelector;
 import totoro.application.xkf.totoroweather.util.LocationUtil;
 import totoro.application.xkf.totoroweather.util.LogUtil;
@@ -54,7 +58,7 @@ import totoro.application.xkf.totoroweather.util.NetUtil;
 import totoro.application.xkf.totoroweather.util.PreferenceUtil;
 
 public class WeatherActivity extends AppCompatActivity implements AMapLocationListener,
-        OnLoadFinishListener, SwipeRefreshLayout.OnRefreshListener, OnSunChangeListener {
+        OnLoadFinishListener, SwipeRefreshLayout.OnRefreshListener, OnSunChangeListener, NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout dlDrawerLayout;
     private CollapsingToolbarLayout ctlCollapsingToolbarLayout;
     private ImageView ivHeaderImage;
@@ -133,8 +137,11 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         rvHourlyList = (RecyclerView) findViewById(R.id.rv_hourly_list);
         rvSuggestionList = (RecyclerView) findViewById(R.id.rv_suggestion_list);
         nvNavigationView = (NavigationView) findViewById(R.id.nv_navigation_view);
+        nvNavigationView.setNavigationItemSelectedListener(this);
         View headLayout = nvNavigationView.getHeaderView(0);
         ivNavigationHeadimage = headLayout.findViewById(R.id.iv_navigation_head_image);
+        srlRefreshLayout.setColorSchemeResources
+                (R.color.colorAccent, R.color.red, R.color.blue);
 
         //显示菜单按钮
         setSupportActionBar(tbToolbar);
@@ -146,7 +153,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
             srlRefreshLayout.setRefreshing(true);
             LocationUtil.locationCity(getApplicationContext(), this);
         } else {
-            mSnackbar.setText("没有网").show();
+            mSnackbar.setText(getString(R.string.noNet)).show();
         }
 
     }
@@ -273,11 +280,16 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     @Override
     public void onRefresh() {
         srlRefreshLayout.setRefreshing(true);
-        String city = mDataService.getCurrentCityId();
-        if (city == null) {
-            LocationUtil.locationCity(this.getApplicationContext(), this);
+        if (NetUtil.isNetConnectivity(this)) {
+            String city = mDataService.getCurrentCityId();
+            if (city == null) {
+                LocationUtil.locationCity(this.getApplicationContext(), this);
+            } else {
+                mDataService.loadWeatherInfo(city, this);
+            }
         } else {
-            mDataService.loadWeatherInfo(city, this);
+            mSnackbar.setText(getString(R.string.noNet)).show();
+            srlRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -286,5 +298,40 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     public void onSunChange(String dayCode, String nightCode, String sunRise, String sunSet) {
         ivHeaderImage.setImageResource(ImageSelector.selectHeadImage(dayCode, nightCode, sunRise, sunSet));
         ivNavigationHeadimage.setImageResource(ImageSelector.selectNavitionHeadImage(sunRise, sunSet));
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                item.setChecked(false);
+            }
+        }, 100);
+        dlDrawerLayout.closeDrawers();
+        switch (item.getItemId()) {
+            case R.id.share:
+                share(getString(R.string.shareApp).replace
+                        ("@", mDataService.getCurrentWeather().getNowWeather().getName() +
+                                mDataService.getCurrentWeather().getNowWeather().getTemperature()));
+                break;
+            case R.id.quit:
+                AlertDialogBuilder.createDialog
+                        (this, item.getTitle().toString(), getString(R.string.askQuit), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                System.exit(0);
+                            }
+                        });
+                break;
+        }
+        return true;
+    }
+
+    public void share(String message) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, message);
+        startActivity(Intent.createChooser(intent, "请选择"));
     }
 }

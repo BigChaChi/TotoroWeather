@@ -28,6 +28,7 @@ import totoro.application.xkf.totoroweather.util.UrlBuilder;
 public class DataService extends Service {
     private Handler mainThread = new Handler(Looper.getMainLooper());
     private String mCurrentCityId = null;
+    private Weather mCurrentWeather;
 
     public DataService() {
     }
@@ -63,6 +64,7 @@ public class DataService extends Service {
                 Gson gson = new Gson();
                 JsonForWeather jsonWeather = gson.fromJson(json, JsonForWeather.class);
                 final Weather weather = jsonWeather.changeToWeather();
+                mCurrentWeather = weather;
                 mainThread.post(new Runnable() {
                     @Override
                     public void run() {
@@ -104,7 +106,7 @@ public class DataService extends Service {
         return mCurrentCityId;
     }
 
-    public void setCurrentCityId(String currentCityId) {
-        this.mCurrentCityId = currentCityId;
+    public Weather getCurrentWeather() {
+        return mCurrentWeather;
     }
 }
