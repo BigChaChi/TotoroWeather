@@ -39,7 +39,7 @@ public class ImageSelector {
             }
         } else if (code >= 400 && code <= 407) {
             //雪
-            image = R.mipmap.header_weather_night_sunny;
+            image = R.mipmap.header_weather_night_snow;
             if (isDay) {
                 image = R.mipmap.header_weather_day_snow;
             }
@@ -139,6 +139,37 @@ public class ImageSelector {
             image = R.mipmap.ic_weather_icon_901;
         } else {
             image = R.mipmap.ic_weather_icon_999;
+        }
+        return image;
+    }
+
+    public static int selectSuggestionIcon(int position) {
+        int image = 0;
+        switch (position) {
+            case 0:
+                image = R.mipmap.ic_weather_icon_208;
+                break;
+            case 1:
+                image = R.mipmap.ic_suggestion_comfort;
+                break;
+            case 2:
+                image = R.mipmap.ic_suggestion_car;
+                break;
+            case 3:
+                image = R.mipmap.ic_suggestion_clothe;
+                break;
+            case 4:
+                image = R.mipmap.ic_suggestion_flu;
+                break;
+            case 5:
+                image = R.mipmap.ic_suggestion_sport;
+                break;
+            case 6:
+                image = R.mipmap.ic_suggestion_travel;
+                break;
+            case 7:
+                image = R.mipmap.ic_suggestion_uv;
+                break;
         }
         return image;
     }

@@ -2,10 +2,12 @@ package totoro.application.xkf.totoroweather.json;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import totoro.application.xkf.totoroweather.model.DailyForecast;
 import totoro.application.xkf.totoroweather.model.HourlyForecast;
 import totoro.application.xkf.totoroweather.model.NowWeather;
+import totoro.application.xkf.totoroweather.model.Suggestion;
 import totoro.application.xkf.totoroweather.model.Weather;
 import totoro.application.xkf.totoroweather.util.LogUtil;
 
@@ -13,19 +15,19 @@ public class JsonForWeather {
     //Json数据的解析
     private List<Info> HeWeather5;
 
-    public class Info {
-        public Basic basic;
-        public Now now;
-        public List<DailyForecast> daily_forecast;
-        public List<HourlyForecast> hourly_forecast;
-//        public Suggestion suggestion;
+    private class Info {
+        private Basic basic;
+        private Now now;
+        private List<DailyForecast> daily_forecast;
+        private List<HourlyForecast> hourly_forecast;
+        private Suggestion suggestion;
 
-        public class Basic {
+        private class Basic {
             public String city;
             public String id;
         }
 
-        public class DailyForecast {
+        private class DailyForecast {
             public Astro astro;
 
             public class Astro {
@@ -57,25 +59,25 @@ public class JsonForWeather {
 
         }
 
-        public class HourlyForecast {
-            public Cond cond;
+        private class HourlyForecast {
+            private Cond cond;
 
-            public class Cond {
-                public String code;
-                public String txt;
+            private class Cond {
+                private String code;
+                private String txt;
             }
 
-            public String date;
-            public String tmp;
-            public Wind wind;
+            private String date;
+            private String tmp;
+            private Wind wind;
 
-            public class Wind {
-                public String dir;
-                public String sc;
+            private class Wind {
+                private String dir;
+                private String sc;
             }
         }
 
-        public class Now {
+        private class Now {
             public Cond cond;
 
             public class Cond {
@@ -93,7 +95,62 @@ public class JsonForWeather {
             }
         }
 
-        public class Suggestion {
+        private class Suggestion {
+            private Air air;
+
+            private class Air {
+                private String brf;
+                private String txt;
+            }
+
+            private Comf comf;
+
+            private class Comf {
+                private String brf;
+                private String txt;
+            }
+
+            private Cw cw;
+
+            private class Cw {
+                private String brf;
+                private String txt;
+            }
+
+            private Drsg drsg;
+
+            private class Drsg {
+                private String brf;
+                private String txt;
+            }
+
+            private Flu flu;
+
+            private class Flu {
+                private String brf;
+                private String txt;
+            }
+
+            private Sport sport;
+
+            private class Sport {
+                private String brf;
+                private String txt;
+            }
+
+            private Trav trav;
+
+            private class Trav {
+                private String brf;
+                private String txt;
+            }
+
+            private Uv uv;
+
+            private class Uv {
+                private String brf;
+                private String txt;
+            }
         }
     }
 
@@ -106,6 +163,8 @@ public class JsonForWeather {
         weather.setDailyForecast(dailyForecast);
         HourlyForecast hourlyForecast = getHourlyForecast(info);
         weather.setHourlyForecast(hourlyForecast);
+        Suggestion suggestion = getSuggestion(info);
+        weather.setSuggestion(suggestion);
         return weather;
     }
 
@@ -158,5 +217,40 @@ public class JsonForWeather {
         }
         dailyForecast.setDailyForecast(list);
         return dailyForecast;
+    }
+
+    public Suggestion getSuggestion(Info info) {
+        Suggestion suggestion = new Suggestion();
+        for (int i = 0; i < suggestion.getTypes().length; i++) {
+            Map<String, String> map = suggestion.getMap();
+            LogUtil.show(info.suggestion.air.brf + "&" + info.suggestion.air.txt);
+            switch (i) {
+                case 0:
+                    map.put(suggestion.getTypes()[i], info.suggestion.air.brf + "&" + info.suggestion.air.txt);
+                    break;
+                case 1:
+                    map.put(suggestion.getTypes()[i], info.suggestion.comf.brf + "&" + info.suggestion.comf.txt);
+                    break;
+                case 2:
+                    map.put(suggestion.getTypes()[i], info.suggestion.cw.brf + "&" + info.suggestion.cw.txt);
+                    break;
+                case 3:
+                    map.put(suggestion.getTypes()[i], info.suggestion.drsg.brf + "&" + info.suggestion.drsg.txt);
+                    break;
+                case 4:
+                    map.put(suggestion.getTypes()[i], info.suggestion.flu.brf + "&" + info.suggestion.flu.txt);
+                    break;
+                case 5:
+                    map.put(suggestion.getTypes()[i], info.suggestion.sport.brf + "&" + info.suggestion.sport.txt);
+                    break;
+                case 6:
+                    map.put(suggestion.getTypes()[i], info.suggestion.trav.brf + "&" + info.suggestion.trav.txt);
+                    break;
+                case 7:
+                    map.put(suggestion.getTypes()[i], info.suggestion.uv.brf + "&" + info.suggestion.uv.txt);
+                    break;
+            }
+        }
+        return suggestion;
     }
 }

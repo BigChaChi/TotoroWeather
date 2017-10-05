@@ -35,11 +35,13 @@ import java.util.List;
 import totoro.application.xkf.totoroweather.R;
 import totoro.application.xkf.totoroweather.adapter.DailyForecastListAdapter;
 import totoro.application.xkf.totoroweather.adapter.HourlyForecastListAdapter;
+import totoro.application.xkf.totoroweather.adapter.SuggestionListAdapter;
 import totoro.application.xkf.totoroweather.application.AppCache;
 import totoro.application.xkf.totoroweather.listener.OnLoadFinishListener;
 import totoro.application.xkf.totoroweather.model.DailyForecast;
 import totoro.application.xkf.totoroweather.model.HourlyForecast;
 import totoro.application.xkf.totoroweather.model.NowWeather;
+import totoro.application.xkf.totoroweather.model.Suggestion;
 import totoro.application.xkf.totoroweather.model.Weather;
 import totoro.application.xkf.totoroweather.service.DataService;
 import totoro.application.xkf.totoroweather.util.ImageSelector;
@@ -215,7 +217,16 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         updateNowWeather(weather.getNowWeather());
         updateDailyForecast(weather.getDailyForecast());
         updateHourlyForecast(weather.getHourlyForecast());
+        updateSuggestion(weather.getSuggestion());
         srlRefreshLayout.setRefreshing(false);
+    }
+
+    private void updateSuggestion(Suggestion suggestion) {
+        SuggestionListAdapter adapter = new SuggestionListAdapter(suggestion);
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        manager.setOrientation(LinearLayoutManager.VERTICAL);
+        rvSuggestionList.setLayoutManager(manager);
+        rvSuggestionList.setAdapter(adapter);
     }
 
     public void updateNowWeather(NowWeather nowWeather) {
