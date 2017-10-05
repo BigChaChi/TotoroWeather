@@ -15,8 +15,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -55,6 +57,7 @@ import totoro.application.xkf.totoroweather.util.ImageSelector;
 import totoro.application.xkf.totoroweather.util.LocationUtil;
 import totoro.application.xkf.totoroweather.util.LogUtil;
 import totoro.application.xkf.totoroweather.util.NetUtil;
+import totoro.application.xkf.totoroweather.util.NightModeHelper;
 import totoro.application.xkf.totoroweather.util.PreferenceUtil;
 
 public class WeatherActivity extends AppCompatActivity implements AMapLocationListener,
@@ -71,22 +74,25 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     private TextView tvTmpAndWeather;
     private TextView tvFeelAndWind;
     private NavigationView nvNavigationView;
-    private ImageView ivNavigationHeadimage;
+    private ImageView ivNavigationHeadImage;
 
     private Handler mHandler = new Handler();
     private Snackbar mSnackbar;
     private DataService mDataService;
-
-    private static final int REQUEST_CODE = 1;
-    private boolean canFinish;
+    private final int REQUEST_CODE = 1;
+    private boolean canLocation = true;
+    private boolean canFinish = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (PreferenceUtil.getIsNightMode()) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
         mDataService = AppCache.getDataService();
-        PreferenceUtil.setContext(this.getApplicationContext());
         checkPermissions();
+
     }
 
     private void checkPermissions() {
@@ -118,7 +124,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     }
 
     private void initViews() {
-        LocationUtil.locationCity(getApplicationContext(), this);
+        LogUtil.show();
         //隐藏状态栏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -139,23 +145,29 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         nvNavigationView = (NavigationView) findViewById(R.id.nv_navigation_view);
         nvNavigationView.setNavigationItemSelectedListener(this);
         View headLayout = nvNavigationView.getHeaderView(0);
-        ivNavigationHeadimage = headLayout.findViewById(R.id.iv_navigation_head_image);
+        ivNavigationHeadImage = headLayout.findViewById(R.id.iv_navigation_head_image);
         srlRefreshLayout.setColorSchemeResources
                 (R.color.colorAccent, R.color.red, R.color.blue);
-
         //显示菜单按钮
         setSupportActionBar(tbToolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.mipmap.ic_menu);
         if (NetUtil.isNetConnectivity(this)) {
-            //有网就定位当前城市
-            srlRefreshLayout.setRefreshing(true);
-            LocationUtil.locationCity(getApplicationContext(), this);
+            if (mDataService.getCurrentWeather() == null) {
+                //有网就定位当前城市
+                srlRefreshLayout.setRefreshing(true);
+                LocationUtil.locationCity(getApplicationContext(), this);
+            } else {
+                Weather weather = mDataService.getCurrentWeather();
+                updateNowWeather(weather.getNowWeather());
+                updateDailyForecast(weather.getDailyForecast());
+                updateHourlyForecast(weather.getHourlyForecast());
+                updateSuggestion(weather.getSuggestion());
+            }
         } else {
             mSnackbar.setText(getString(R.string.noNet)).show();
         }
-
     }
 
 
@@ -208,12 +220,15 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     public void onLocationChanged(AMapLocation aMapLocation) {
         if (aMapLocation != null) {
             if (aMapLocation.getErrorCode() == 0) {
-                if (mDataService.getCurrentCityId() == null) {
+                //高德定位不知道为啥有的时候会连续定位两次
+                //所以增加这个变量来控制反复加载
+                if (canLocation) {
                     LocationUtil.stop();
                     String city = aMapLocation.getCity();
                     ctlCollapsingToolbarLayout.setTitle(city);
                     mDataService.searchCity(city, true, null);
                     mDataService.loadWeatherInfo(city, this);
+                    canLocation = false;
                 }
             } else {
                 //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
@@ -297,32 +312,45 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     @Override
     public void onSunChange(String dayCode, String nightCode, String sunRise, String sunSet) {
         ivHeaderImage.setImageResource(ImageSelector.selectHeadImage(dayCode, nightCode, sunRise, sunSet));
-        ivNavigationHeadimage.setImageResource(ImageSelector.selectNavitionHeadImage(sunRise, sunSet));
+        ivNavigationHeadImage.setImageResource(ImageSelector.selectNavitionHeadImage(sunRise, sunSet));
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                item.setChecked(false);
-            }
-        }, 100);
         dlDrawerLayout.closeDrawers();
         switch (item.getItemId()) {
+            case R.id.night_mode:
+                if (PreferenceUtil.getIsNightMode()) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                }
+                PreferenceUtil.saveIsNightMode(!PreferenceUtil.getIsNightMode());
+                recreate();
+                break;
+            case R.id.location_again:
+                if (NetUtil.isNetConnectivity(this)) {
+                    srlRefreshLayout.setRefreshing(true);
+                    canLocation = true;
+                    LocationUtil.locationCity(getApplicationContext(), this);
+                } else {
+                    mSnackbar.setText(getString(R.string.noNet)).show();
+                }
+                break;
             case R.id.share:
                 share(getString(R.string.shareApp).replace
                         ("@", mDataService.getCurrentWeather().getNowWeather().getName() +
                                 mDataService.getCurrentWeather().getNowWeather().getTemperature()));
                 break;
             case R.id.quit:
-                AlertDialogBuilder.createDialog
-                        (this, item.getTitle().toString(), getString(R.string.askQuit), new DialogInterface.OnClickListener() {
+                AlertDialogBuilder.createDialog(this, item.getTitle().toString(),
+                        getString(R.string.askQuit), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 System.exit(0);
                             }
                         });
+
                 break;
         }
         return true;

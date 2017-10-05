@@ -18,6 +18,7 @@ import com.viksaa.sssplash.lib.model.ConfigSplash;
 import totoro.application.xkf.totoroweather.R;
 import totoro.application.xkf.totoroweather.application.AppCache;
 import totoro.application.xkf.totoroweather.service.DataService;
+import totoro.application.xkf.totoroweather.util.PreferenceUtil;
 
 public class SplashActivity extends AwesomeSplash {
 
@@ -25,8 +26,13 @@ public class SplashActivity extends AwesomeSplash {
     public void initSplash(ConfigSplash configSplash) {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        PreferenceUtil.setContext(this.getApplicationContext());
         //一个开源库，用于加载一进来的界面
-        configSplash.setBackgroundColor(R.color.colorPrimary);
+        if (PreferenceUtil.getIsNightMode()) {
+            configSplash.setBackgroundColor(R.color.grey);
+        } else {
+            configSplash.setBackgroundColor(R.color.colorPrimary);
+        }
         configSplash.setAnimCircularRevealDuration(1000);
         configSplash.setRevealFlagX(Flags.REVEAL_RIGHT);
         configSplash.setRevealFlagY(Flags.REVEAL_BOTTOM);

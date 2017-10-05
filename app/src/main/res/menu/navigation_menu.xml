@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <group android:checkableBehavior="all">
         <item
             android:id="@+id/city_manage"
             android:icon="@mipmap/ic_menu_setting"
@@ -29,5 +28,4 @@
             android:id="@+id/quit"
             android:icon="@mipmap/ic_menu_exit"
             android:title="@string/quit" />
-    </group>
 </menu>

@@ -225,7 +225,6 @@ public class JsonForWeather {
         Suggestion suggestion = new Suggestion();
         for (int i = 0; i < suggestion.getTypes().length; i++) {
             Map<String, String> map = suggestion.getMap();
-            LogUtil.show(info.suggestion.air.brf + "&" + info.suggestion.air.txt);
             switch (i) {
                 case 0:
                     map.put(suggestion.getTypes()[i], info.suggestion.air.brf + "&" + info.suggestion.air.txt);

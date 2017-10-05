@@ -16,12 +16,11 @@ public class LocationUtil {
         option.setOnceLocation(true);
         option.setOnceLocationLatest(true);
         client.setLocationOption(option);
-        client.startLocation();
         client.setLocationListener(listener);
+        client.startLocation();
     }
 
     public static void stop() {
-        client.stopLocation();
         client.onDestroy();
     }
 }

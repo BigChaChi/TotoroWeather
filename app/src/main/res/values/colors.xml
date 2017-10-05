@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <color name="colorPrimary">#FF9800</color>
     <color name="colorPrimaryDark">#FF9800</color>
     <color name="colorAccent">#FF9800</color>
@@ -8,5 +9,4 @@
     <color name="red">@android:color/holo_red_light</color>
     <color name="blue">@android:color/holo_blue_light</color>
     <color name="grey">#607D8B</color>
-
 </resources>

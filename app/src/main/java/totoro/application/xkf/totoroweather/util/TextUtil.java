@@ -20,7 +20,7 @@ public class TextUtil {
         List<String> list = new ArrayList<>();
         String[] names = all.split("&");
         for (String str : names) {
-            String[] city = str.split("|");
+            String[] city = str.split("@");
             list.add(city[0]);
         }
         return list;
@@ -33,7 +33,7 @@ public class TextUtil {
         List<String> list = new ArrayList<>();
         String[] names = all.split("&");
         for (String str : names) {
-            String[] city = str.split("|");
+            String[] city = str.split("@");
             list.add(city[1]);
         }
         return list;
