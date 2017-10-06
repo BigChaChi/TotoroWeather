@@ -45,8 +45,10 @@ import totoro.application.xkf.totoroweather.adapter.DailyForecastListAdapter;
 import totoro.application.xkf.totoroweather.adapter.HourlyForecastListAdapter;
 import totoro.application.xkf.totoroweather.adapter.SuggestionListAdapter;
 import totoro.application.xkf.totoroweather.application.AppCache;
+import totoro.application.xkf.totoroweather.listener.OnCityChangeListener;
 import totoro.application.xkf.totoroweather.listener.OnLoadFinishListener;
 import totoro.application.xkf.totoroweather.listener.OnSunChangeListener;
+import totoro.application.xkf.totoroweather.model.City;
 import totoro.application.xkf.totoroweather.model.DailyForecast;
 import totoro.application.xkf.totoroweather.model.HourlyForecast;
 import totoro.application.xkf.totoroweather.model.NowWeather;
@@ -63,7 +65,7 @@ import totoro.application.xkf.totoroweather.util.PreferenceUtil;
 
 public class WeatherActivity extends AppCompatActivity implements AMapLocationListener,
         OnLoadFinishListener, SwipeRefreshLayout.OnRefreshListener, OnSunChangeListener,
-        NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+        NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, OnCityChangeListener {
     private DrawerLayout dlDrawerLayout;
     private CollapsingToolbarLayout ctlCollapsingToolbarLayout;
     private ImageView ivHeaderImage;
@@ -94,6 +96,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
         mDataService = AppCache.getDataService();
+        mDataService.setCityChangeListener(this);
         checkPermissions();
 
     }
@@ -232,7 +235,6 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
                 if (canLocation) {
                     LocationUtil.stop();
                     String city = aMapLocation.getCity();
-                    ctlCollapsingToolbarLayout.setTitle(city);
                     mDataService.searchCity(city, true, null);
                     mDataService.loadWeatherInfo(city, this);
                     canLocation = false;
@@ -267,6 +269,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     }
 
     public void updateNowWeather(NowWeather nowWeather) {
+        ctlCollapsingToolbarLayout.setTitle(nowWeather.getName());
         String feelAndWnd = "体感温度  " + nowWeather.getFeel() + "°  " + nowWeather.getWindType() + "  " +
                 nowWeather.getWindDegree() + "级";
         tvFeelAndWind.setText(feelAndWnd);
@@ -373,5 +376,10 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     @Override
     public void onClick(View view) {
         startActivity(new Intent(this, SearchActivity.class));
+    }
+
+    @Override
+    public void onCityChange(City city) {
+        onRefresh();
     }
 }

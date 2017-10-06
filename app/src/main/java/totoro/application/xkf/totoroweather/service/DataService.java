@@ -11,12 +11,15 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
+import totoro.application.xkf.totoroweather.activity.WeatherActivity;
 import totoro.application.xkf.totoroweather.json.JsonForCity;
 import totoro.application.xkf.totoroweather.json.JsonForWeather;
+import totoro.application.xkf.totoroweather.listener.OnCityChangeListener;
 import totoro.application.xkf.totoroweather.listener.OnLoadFinishListener;
 import totoro.application.xkf.totoroweather.listener.OnSearchFinishListener;
 import totoro.application.xkf.totoroweather.model.City;
@@ -29,6 +32,7 @@ public class DataService extends Service {
     private Handler mainThread = new Handler(Looper.getMainLooper());
     private String mCurrentCityId = null;
     private Weather mCurrentWeather;
+    private OnCityChangeListener mCityChangeListener;
 
     public DataService() {
     }
@@ -37,6 +41,7 @@ public class DataService extends Service {
     public IBinder onBind(Intent intent) {
         return new SingleHolder();
     }
+
 
     public class SingleHolder extends Binder {
         public DataService getDataService() {
@@ -84,7 +89,9 @@ public class DataService extends Service {
         HttpUtil.sendRequest(url, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
+                if (listener != null) {
+                    listener.onSearchFail();
+                }
             }
 
             @Override
@@ -92,14 +99,31 @@ public class DataService extends Service {
                 String json = response.body().string();
                 Gson gson = new Gson();
                 JsonForCity jsonForCity = gson.fromJson(json, JsonForCity.class);
-                City city = jsonForCity.changeToCity();
                 if (isLocal) {
+                    City city = jsonForCity.changeToFirstCity();
                     PreferenceUtil.saveLocalCityId(city.getId());
                 } else {
-                    listener.onSearchSuccess(city);
+                    final List<City> cityList = jsonForCity.changeToCityList();
+                    mainThread.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onSearchSuccess(cityList);
+                        }
+                    });
                 }
             }
         });
+    }
+
+    public void setCityChangeListener(OnCityChangeListener listener) {
+        mCityChangeListener = listener;
+    }
+
+    public void onCityChange(City city) {
+        mCurrentCityId=city.getId();
+        if (mCityChangeListener != null) {
+            mCityChangeListener.onCityChange(city);
+        }
     }
 
     public String getCurrentCityId() {
