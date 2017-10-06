@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -61,7 +62,8 @@ import totoro.application.xkf.totoroweather.util.NightModeHelper;
 import totoro.application.xkf.totoroweather.util.PreferenceUtil;
 
 public class WeatherActivity extends AppCompatActivity implements AMapLocationListener,
-        OnLoadFinishListener, SwipeRefreshLayout.OnRefreshListener, OnSunChangeListener, NavigationView.OnNavigationItemSelectedListener {
+        OnLoadFinishListener, SwipeRefreshLayout.OnRefreshListener, OnSunChangeListener,
+        NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
     private DrawerLayout dlDrawerLayout;
     private CollapsingToolbarLayout ctlCollapsingToolbarLayout;
     private ImageView ivHeaderImage;
@@ -75,6 +77,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     private TextView tvFeelAndWind;
     private NavigationView nvNavigationView;
     private ImageView ivNavigationHeadImage;
+    private FloatingActionButton fabSearch;
 
     private Handler mHandler = new Handler();
     private Snackbar mSnackbar;
@@ -139,6 +142,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         srlRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.srl_refresh_layout);
         mSnackbar = Snackbar.make(ctlCollapsingToolbarLayout, "", Snackbar.LENGTH_SHORT);
         srlRefreshLayout.setOnRefreshListener(this);
+        fabSearch = (FloatingActionButton) findViewById(R.id.fab_search);
         rvDailyForecastList = (RecyclerView) findViewById(R.id.rv_forecast_list);
         rvHourlyList = (RecyclerView) findViewById(R.id.rv_hourly_list);
         rvSuggestionList = (RecyclerView) findViewById(R.id.rv_suggestion_list);
@@ -148,11 +152,14 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         ivNavigationHeadImage = headLayout.findViewById(R.id.iv_navigation_head_image);
         srlRefreshLayout.setColorSchemeResources
                 (R.color.colorAccent, R.color.red, R.color.blue);
+        fabSearch.setOnClickListener(this);
+
         //显示菜单按钮
         setSupportActionBar(tbToolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.mipmap.ic_menu);
+
         if (NetUtil.isNetConnectivity(this)) {
             if (mDataService.getCurrentWeather() == null) {
                 //有网就定位当前城市
@@ -361,5 +368,10 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_TEXT, message);
         startActivity(Intent.createChooser(intent, "请选择"));
+    }
+
+    @Override
+    public void onClick(View view) {
+        startActivity(new Intent(this, SearchActivity.class));
     }
 }
