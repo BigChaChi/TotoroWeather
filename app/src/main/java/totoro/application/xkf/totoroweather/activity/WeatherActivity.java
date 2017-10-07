@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -16,28 +15,23 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import totoro.application.xkf.totoroweather.R;
@@ -60,7 +54,6 @@ import totoro.application.xkf.totoroweather.util.ImageSelector;
 import totoro.application.xkf.totoroweather.util.LocationUtil;
 import totoro.application.xkf.totoroweather.util.LogUtil;
 import totoro.application.xkf.totoroweather.util.NetUtil;
-import totoro.application.xkf.totoroweather.util.NightModeHelper;
 import totoro.application.xkf.totoroweather.util.PreferenceUtil;
 
 public class WeatherActivity extends AppCompatActivity implements AMapLocationListener,
@@ -130,7 +123,6 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     }
 
     private void initViews() {
-        LogUtil.show();
         //隐藏状态栏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -329,6 +321,9 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
     public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
         dlDrawerLayout.closeDrawers();
         switch (item.getItemId()) {
+            case R.id.city_manage:
+                startActivity(new Intent(this, CityManageActivity.class));
+                break;
             case R.id.night_mode:
                 if (PreferenceUtil.getIsNightMode()) {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -360,7 +355,6 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
                                 System.exit(0);
                             }
                         });
-
                 break;
         }
         return true;

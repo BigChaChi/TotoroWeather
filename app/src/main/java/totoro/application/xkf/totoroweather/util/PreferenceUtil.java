@@ -31,12 +31,17 @@ public class PreferenceUtil {
     public static void addCity(String name, String id) {
         List<String> list = TextUtil.getIds(getAllCities());
         if (!TextUtil.hasCommonCity(id, list) || list == null) {
-            TextUtil.addText(getAllCities(), name + "@" + id);
+            String newAllCities = TextUtil.addText(getAllCities(), name + "@" + id);
+            getInstance().edit().putString(sContext.getString(R.string.allCities), newAllCities).apply();
         }
     }
 
     public static String getAllCities() {
         return getInstance().getString(sContext.getString(R.string.allCities), "");
+    }
+
+    private static void saveAllCities(String all) {
+        getInstance().edit().putString(sContext.getString(R.string.allCities), all).apply();
     }
 
     public static boolean getIsNightMode() {
@@ -46,4 +51,11 @@ public class PreferenceUtil {
     public static void saveIsNightMode(boolean isNightMode) {
         getInstance().edit().putBoolean(sContext.getString(R.string.isNightMode), isNightMode).apply();
     }
+
+    public static void deleteCity(String city, String id) {
+        String newAllCity = TextUtil.deleteCity(city, id, getAllCities());
+        LogUtil.show(newAllCity);
+        saveAllCities(newAllCity);
+    }
+
 }

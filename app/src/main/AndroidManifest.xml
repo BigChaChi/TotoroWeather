@@ -52,7 +52,8 @@
         <activity
             android:name=".activity.WeatherActivity"
             android:launchMode="singleTop" />
-        <activity android:name=".activity.SearchActivity"></activity>
+        <activity android:name=".activity.SearchActivity" />
+        <activity android:name=".activity.CityManageActivity"></activity>
     </application>
 
 </manifest>

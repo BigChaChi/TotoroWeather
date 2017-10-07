@@ -44,10 +44,17 @@ public class TextUtil {
             return true;
         }
         for (String id : allCityId) {
-            if (id == cityId) {
+            if (id.equals(cityId)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public static String deleteCity(String city, String id, String all) {
+        int start = all.indexOf(city);
+        int end = start + city.length() + 1 + id.length();
+        StringBuilder builder = new StringBuilder(all);
+        return builder.delete(start - 1, end).toString();
     }
 }
