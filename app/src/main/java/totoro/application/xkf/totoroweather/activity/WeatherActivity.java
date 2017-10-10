@@ -115,7 +115,7 @@ public class WeatherActivity extends AppCompatActivity implements AMapLocationLi
                 permissions.add(Manifest.permission.READ_PHONE_STATE);
             }
         }
-        if (!permissions.isEmpty()) {
+        if (!permissions.isEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(permissions.toArray(new String[permissions.size()]), REQUEST_CODE);
         } else {
             initViews();
